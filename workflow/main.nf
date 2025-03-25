@@ -7,8 +7,8 @@ process FastQC {
     tuple val(sample_id), path(reads)
 
     output:
-    path("${sample_id}_fastqc.zip")
     path("${sample_id}_fastqc.html")
+    path("${sample_id}_fastqc.zip")
 
     script:
     """
@@ -17,12 +17,14 @@ process FastQC {
 }
 
 workflow {
+
     Channel
         .fromPath('data/*.fastq.gz')
         .map { file ->
-            def id = file.baseName.replaceAll(/\.fastq\.gz$/, '')
+            def id = file.getBaseName().replaceFirst(/\.fastq\.gz$/, '').replaceFirst(/\.gz$/, '')
             tuple(id, file)
         }
-        |>
-        FastQC
+        .set { read_pairs }
+
+    FastQC(read_pairs)
 }
