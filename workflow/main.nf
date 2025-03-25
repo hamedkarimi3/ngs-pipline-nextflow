@@ -18,13 +18,12 @@ process FastQC {
 
 workflow {
 
-    Channel
+    reads_ch = Channel
         .fromPath('data/*.fastq.gz')
         .map { file ->
-            def id = file.getBaseName().replaceFirst(/\.fastq\.gz$/, '').replaceFirst(/\.gz$/, '')
+            def id = file.getName().replaceFirst(/\.fastq\.gz$/, '')
             tuple(id, file)
         }
-        .set { read_pairs }
 
-    FastQC(read_pairs)
+    FastQC(reads_ch)
 }
